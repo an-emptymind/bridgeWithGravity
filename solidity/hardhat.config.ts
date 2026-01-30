@@ -37,6 +37,7 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      hardfork: "merge",
       mining: {
         auto: false,
         interval: [3000, 6000]
