@@ -40,17 +40,33 @@ pub async fn get_last_checked_block(
     // zero event nonce (it's pre-incremented in the solidity contract) we have to go
     // and look for event nonce one.
     if last_event_nonce == 0u8.into() {
-        last_event_nonce = 1u8.into();
+        let start_block: Uint256 = 10154838u128.into();
+        warn!("Last event nonce is 0 - this oracle has never submitted an event");
+        warn!("Starting from block {} to catch all Gravity contract events", start_block);
+        return start_block;
     }
+
+    // If last_event_nonce is 1, this is likely right after contract deployment
+    // Start from the deployment block to avoid scanning thousands of blocks backwards
+    if last_event_nonce == 1u8.into() {
+        let start_block: Uint256 = 10154838u128.into();
+        warn!("Last event nonce is 1 - starting from Gravity contract deployment block");
+        warn!("Starting from block {} (contract deployed at 10154838)", start_block);
+        return start_block;
+    }
+
+    // Minimum block to search - the Gravity contract deployment block on Sepolia
+    // This prevents scanning the entire blockchain history
+    let min_block: Uint256 = 10154838u128.into();
 
     let mut current_block: Uint256 = latest_block;
 
-    while current_block > 0u8.into() {
+    while current_block > min_block {
         info!(
             "Oracle is resyncing, looking back into the history to find our last event nonce {last_event_nonce}, on block {current_block}"
         );
-        let end_search = if current_block < BLOCKS_TO_SEARCH.into() {
-            0u8.into()
+        let end_search = if current_block < BLOCKS_TO_SEARCH.into() || current_block - BLOCKS_TO_SEARCH.into() < min_block {
+            min_block
         } else {
             current_block - BLOCKS_TO_SEARCH.into()
         };

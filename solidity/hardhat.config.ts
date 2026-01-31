@@ -2,6 +2,9 @@ import "@nomiclabs/hardhat-waffle";
 import "hardhat-gas-reporter";
 import "hardhat-typechain";
 import { task } from "hardhat/config";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 task("accounts", "Prints the list of accounts", async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -830,6 +833,13 @@ module.exports = {
           balance: "4951760157141521099596496895"
         }
       ]
+    },
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY",
+      chainId: 11155111,
+      accounts: process.env.SEPOLIA_PRIVATE_KEY ? [process.env.SEPOLIA_PRIVATE_KEY] : [],
+      timeout: 60000,
+      gasPrice: "auto"
     }
   },
   typechain: {
