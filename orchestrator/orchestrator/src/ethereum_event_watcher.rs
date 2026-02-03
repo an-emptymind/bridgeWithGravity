@@ -299,6 +299,9 @@ pub async fn get_latest_safe_block(web3: &Web3) -> Uint256 {
         // up to num validators blocks. Number is higher than Ethereum based
         // on experience with operational issues
         4 | 5 => block_number - 10u8.into(),
+        // Sepolia testnet - FAST MODE FOR TESTING (10 blocks = ~2 minutes)
+        // WARNING: Not safe for production! Only for testing.
+        11155111 => block_number - 10u8.into(),
         // assume the safe option where we don't know
         _ => block_number - 96u8.into(),
     }
